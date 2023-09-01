@@ -15,12 +15,13 @@ namespace SleepOnLongships
     {
         public const string Name = "Sleep on Longships";
         public const string Guid = "beardedkwan.SleepOnLongships";
-        public const string Version = "1.0.0";
+        public const string Version = "1.1.0";
     }
 
     public class SleepOnLongshipsConfig
     {
         public static ConfigEntry<string> KeyUse { get; set; }
+        public static ConfigEntry<bool> ImmuneToWaterDamage { get; set; }
     }
 
     [BepInPlugin(PluginInfo.Guid, PluginInfo.Name, PluginInfo.Version)]
@@ -31,6 +32,7 @@ namespace SleepOnLongships
         {
             // Initialize config
             SleepOnLongshipsConfig.KeyUse = Config.Bind("General", "KeyUse", "F", "Shift + [KeyUse] when focused on a stool on the longship (or the bench on the karve) will initiate sleep.\nMake this key the same as your 'use' key in your game settings.");
+            SleepOnLongshipsConfig.ImmuneToWaterDamage = Config.Bind("General", "ImmuneToWaterDamage", true, "Makes ships immune to water impact damage (sleeping on ship can sometimes cause water impact damage).");
 
             Harmony harmony = new Harmony(PluginInfo.Guid);
             harmony.PatchAll();
@@ -90,7 +92,10 @@ namespace SleepOnLongships
         {
             private static void Prefix(ref Ship __instance)
             {
-                __instance.m_waterImpactDamage = 0f;
+                if (SleepOnLongshipsConfig.ImmuneToWaterDamage.Value)
+                {
+                    __instance.m_waterImpactDamage = 0f;
+                }
             }
         }
     }
